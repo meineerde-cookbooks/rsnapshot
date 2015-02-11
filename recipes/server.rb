@@ -22,7 +22,7 @@ bash "create ssh keypair for root" do
   creates "#{root_home}/.ssh/id_rsa"
 end
 
-ruby_block "set public key to node" do
+ruby_block "save ssh public key of root" do
   block do
     node['rsnapshot']['server']['ssh_key'] = File.read("#{root_home}/.ssh/id_rsa.pub").strip
   end
@@ -42,16 +42,15 @@ node['rsnapshot']['server']['clients'].each_pair do |fqdn, paths|
   end
 end
 
-search(:node, "roles:#{node['rsnapshot']['client_role']}") do |client|
-  paths = client['rsnapshot']['client']['paths']
-  next unless paths && paths.any?
+search(:node, node['rsnapshot']['client_search']) do |client|
+  next unless client['rsnapshot'] && client['rsnapshot']['client'] && paths = client['rsnapshot']['client']['paths']
+  next unless paths.any?
 
   paths.each do |path|
     path = path.end_with?("/") ? Shellwords.escape(path) : "#{Shellwords.escape(path)}/"
     if client.name == node.name
       backup_targets << "#{path}\t#{client['fqdn']}/"
     else
-      # FIXME: What about ipv6?
       backup_targets << "#{client['rsnapshot']['client']['user']}@#{client['ipaddress']}:#{path}\t#{client['fqdn']}/"
     end
   end
