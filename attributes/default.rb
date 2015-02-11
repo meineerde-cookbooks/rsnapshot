@@ -1,2 +1,2 @@
-default['rsnapshot']['server_role'] = "rsnapshot_server"
-default['rsnapshot']['client_role'] = "rsnapshot_client"
+default['rsnapshot']['server_search'] = 'roles:rsnapshot_server'
+default['rsnapshot']['client_search'] = 'roles:rsnapshot_client'

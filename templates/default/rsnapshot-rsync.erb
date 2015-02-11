@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if [ "$EUID" -ne "0" ]; then
+  sudo="/usr/bin/sudo -u root -k -n -H --"
+else
+  sudo=""
+fi
+
+if [ -z "$SSH_ORIGINAL_COMMAND" ]; then
+  echo "Can't run interactively." >&2
+  exit 1
+fi
+
+case "$SSH_ORIGINAL_COMMAND" in
+  *\&*|*\(*|*\{*|*\;*|*\<*|*\>*|*\`*|*\|*|*\$*)
+    echo "Forbidden" >&2
+    exit 1
+  ;;
+    <%= node['rsnapshot']['client']['rsync_path'] %>\ --server\ --sender\ *)
+    exec $sudo $SSH_ORIGINAL_COMMAND
+  ;;
+  *)
+    echo "Forbidden." >&2
+    exit 1
+  ;;
+esac
+
