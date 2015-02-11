@@ -15,10 +15,10 @@ fi
 
 nice=""
 <% if node['rsnapshot']['client']['rsync_nice'] %>
-nice="${nice} /usr/bin/nice -n <%= node['rsnapshot']['client']['rsync_nice'].to_s %>"
+nice="${nice} /usr/bin/nice -n <%= node['rsnapshot']['client']['rsync_nice'].to_s %> --"
 <% end %>
 <% if node['rsnapshot']['client']['rsync_ionice'] %>
-nice="${nice} /usr/bin/ionice -c <%= node['rsnapshot']['client']['rsync_ionice'].to_s %>"
+nice="${nice} /usr/bin/ionice -c <%= node['rsnapshot']['client']['rsync_ionice'].to_s %> --"
 <% end %>
 
 case "$SSH_ORIGINAL_COMMAND" in
