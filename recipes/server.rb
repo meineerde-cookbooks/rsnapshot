@@ -38,7 +38,7 @@ backup_targets = []
 node['rsnapshot']['server']['clients'].each_pair do |fqdn, paths|
   Array(paths).each do |path|
     path = path.end_with?("/") ? Shellwords.escape(path) : "#{Shellwords.escape(path)}/"
-    backup_targets << "#{node['rsnapshot']['client']['username']}@#{fqdn}:#{path}\t#{fqdn}/"
+    backup_targets << "#{node['rsnapshot']['client']['user']}@#{fqdn}:#{path}\t#{fqdn}/"
   end
 end
 
@@ -52,7 +52,7 @@ search(:node, "roles:#{node['rsnapshot']['client_role']}") do |client|
       backup_targets << "#{path}\t#{client['fqdn']}/"
     else
       # FIXME: What about ipv6?
-      backup_targets << "#{client['rsnapshot']['client']['username']}@#{client['ipaddress']}:#{path}\t#{client['fqdn']}/"
+      backup_targets << "#{client['rsnapshot']['client']['user']}@#{client['ipaddress']}:#{path}\t#{client['fqdn']}/"
     end
   end
 end
