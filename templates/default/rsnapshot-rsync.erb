@@ -1,23 +1,33 @@
 #!/bin/sh
 
-if [ "$EUID" -ne "0" ]; then
-  sudo="/usr/bin/sudo -u root -k -n -H --"
-else
-  sudo=""
-fi
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 if [ -z "$SSH_ORIGINAL_COMMAND" ]; then
   echo "Can't run interactively." >&2
   exit 1
 fi
 
+if [ "$EUID" -ne "0" ]; then
+  sudo="/usr/bin/sudo -u root -k -n -H --"
+else
+  sudo=""
+fi
+
+nice=""
+<% if node['rsnapshot']['client']['rsync_nice'] %>
+nice="${nice} /usr/bin/nice -n <%= node['rsnapshot']['client']['rsync_nice'].to_s %>"
+<% end %>
+<% if node['rsnapshot']['client']['rsync_ionice'] %>
+nice="${nice} /usr/bin/ionice -c <%= node['rsnapshot']['client']['rsync_ionice'].to_s %>"
+<% end %>
+
 case "$SSH_ORIGINAL_COMMAND" in
   *\&*|*\(*|*\{*|*\;*|*\<*|*\>*|*\`*|*\|*|*\$*)
     echo "Forbidden" >&2
     exit 1
   ;;
-    <%= node['rsnapshot']['client']['rsync_path'] %>\ --server\ --sender\ *)
-    exec $sudo $SSH_ORIGINAL_COMMAND
+  rsync\ --server\ --sender\ *)
+    exec $sudo $nice $SSH_ORIGINAL_COMMAND
   ;;
   *)
     echo "Forbidden." >&2
