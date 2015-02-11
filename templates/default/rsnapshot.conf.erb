@@ -32,10 +32,10 @@ cmd_du			/usr/bin/du
 #########################################
 
 <% node['rsnapshot']['server']['intervals'].tap do |i| %>
-<%= "interval	hourly	#{i['hourly']}" if i['hourly'] %>
-<%= "interval	daily	#{i['daily']}" if i['daily'] %>
-<%= "interval	weekly	#{i['weekly']}" if i['weekly'] %>
-<%= "interval	monthly	#{i['monthly']}" if i['monthly'] %>
+<%= "retain	hourly	#{i['hourly']}" if i['hourly'] %>
+<%= "retain	daily	#{i['daily']}" if i['daily'] %>
+<%= "retain	weekly	#{i['weekly']}" if i['weekly'] %>
+<%= "retain	monthly	#{i['monthly']}" if i['monthly'] %>
 <% end %>
 
 # Verbose level, 1 through 5.
