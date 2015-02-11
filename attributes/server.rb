@@ -10,5 +10,12 @@ default['rsnapshot']['server']['intervals']['daily'] = 7
 default['rsnapshot']['server']['intervals']['weekly'] = 2
 default['rsnapshot']['server']['intervals']['monthly'] = nil
 
+default['rsnapshot']['server']['exclude'] = [
+  'Recycled',
+  'Trash',
+  'lost+found',
+  '.gvfs'
+]
+
 # additional clients which can not be inferred from the client role
 default['rsnapshot']['server']['clients'] = {}

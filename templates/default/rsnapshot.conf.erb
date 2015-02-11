@@ -77,6 +77,15 @@ sync_first	1
 # that directory just before it exits. The default is 0 (off).
 use_lazy_deletes	1
 
+
+#################################
+# Globaly Excluded Directories  #
+#################################
+
+<% node['rsnapshot']['server']['exclude'].each do |exclude|
+exclude	<%= exclude.end_with?("/") ? Shellwords.escape(exclude) : "#{Shellwords.escape(exclude)}/" %>
+<% end %>
+
 ###########################
 # backup targets          #
 ###########################
