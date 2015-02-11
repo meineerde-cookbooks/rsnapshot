@@ -28,7 +28,7 @@ end
 
 sudo_d 'rsnapshot' do
   user node['rsnapshot']['client']['user']
-  commands node['rsnapshot']['client']['rsync_path']
+  commands '/usr/bin/rsync'
   runas 'root'
   nopasswd true
 end
