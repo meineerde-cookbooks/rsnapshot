@@ -32,11 +32,11 @@ cookbook_file "/home/#{node['rsnapshot']['client']['user']}/.ssh/validate-comman
   mode "0755"
 end
 
-template "/etc/sudoers.d/rsnapshot" do
-  source "rsnapshot.sudoers.erb"
-  owner "root"
-  group "root"
-  mode "0440"
+sudo_d 'rsnapshot' do
+  user node['rsnapshot']['client']['user']
+  commands node['rsnapshot']['client']['rsync_path']
+  runas 'root'
+  nopasswd true
 end
 
 ssh_keys = []
