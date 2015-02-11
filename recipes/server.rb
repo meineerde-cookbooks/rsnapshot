@@ -61,7 +61,7 @@ template node['rsnapshot']['server']['config_file'] do
   owner "root"
   group "root"
   mode "0644"
-  variables "backup_targets" => backup_targets,
+  variables "backup_targets" => backup_targets.sort,
             "ssh_key_location" => "#{root_home}/.ssh/id_rsa"
 end
 
