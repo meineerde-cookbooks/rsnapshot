@@ -10,15 +10,15 @@ directory "#{root_home}/.ssh" do
   mode "0700"
 end
 
-execute "create ssh keypair for root" do
+bash "create ssh keypair for root" do
   cwd root_home
   user "root"
-  command <<-KEYGEN.gsub(/^ +/, '')
-    ssh-keygen -t rsa -b 2048 -f #{root_home}/.ssh/id_rsa -N '' \
-    -C 'root@#{node['fqdn']}-#{Time.now.strftime('%FT%T%z')}'
+  command <<-BASH
+    set -e
+    ssh-keygen -t rsa -b 2048 -f "#{root_home}/.ssh/id_rsa" -N '' -C "root@#{node['fqdn']}-#{Time.now.strftime('%FT%T%z')}"
     chmod 0600 #{root_home}/.ssh/id_rsa
     chmod 0644 #{root_home}/.ssh/id_rsa.pub
-  KEYGEN
+  BASH
   creates "#{root_home}/.ssh/id_rsa"
 end
 
