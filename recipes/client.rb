@@ -1,6 +1,6 @@
-include_recipe "rsync"
-include_recipe "openssh"
-include_recipe "sudo"
+include_recipe 'rsync'
+include_recipe 'openssh'
+include_recipe 'sudo'
 
 user node['rsnapshot']['client']['user'] do
   comment 'rsnapshot backup'

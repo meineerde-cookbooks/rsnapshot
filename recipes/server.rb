@@ -1,6 +1,6 @@
-include_recipe "cron"
+include_recipe 'cron'
 
-package "rsnapshot"
+package 'rsnapshot'
 
 # create the private key if necessary
 root_home = node['etc']['passwd']['root']['dir']

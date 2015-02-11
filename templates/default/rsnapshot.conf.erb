@@ -1,4 +1,6 @@
-# This script was automatically created by Chef.
+# rsnapshot server configuration
+#
+# This config file was automatically created by Chef.
 # All manual changes are going to be overridden.
 #
 # Source: rsnapshot::templates/default/rsnapshot.conf.erb
@@ -55,8 +57,8 @@ lockfile	/var/run/rsnapshot.pid
 # Default rsync args. All rsync commands have at least these options set.
 rsync_short_args	-az
 rsync_long_args		--delete --numeric-ids --relative --delete-excluded --stats
-ssh_args		-o BatchMode=yes -i "<%= @ssh_key_location %>"
-du_args			-csh
+ssh_args			-o BatchMode=yes -i "<%= @ssh_key_location %>"
+du_args				-csh
 
 # don't span filesystem partitions within a backup point.
 one_fs		1
@@ -87,7 +89,7 @@ exclude	<%= exclude.end_with?("/") ? Shellwords.escape(exclude) : "#{Shellwords.
 <% end %>
 
 ###########################
-# backup targets          #
+# Backup Targets          #
 ###########################
 
 <% @backup_targets.each do |target| %>
