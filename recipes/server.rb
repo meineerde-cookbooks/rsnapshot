@@ -3,7 +3,7 @@ include_recipe "cron"
 package "rsnapshot"
 
 # create the private key if necessary
-root_home = Etc.getpwnam("root").dir
+root_home = node['etc']['passwd']['root']['dir']
 directory "#{root_home}/.ssh" do
   owner "root"
   group "root"
