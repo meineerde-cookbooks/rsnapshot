@@ -27,7 +27,7 @@ template '/usr/local/bin/rsnapshot-rsync' do
   mode '0755'
 end
 
-sudo_d 'rsnapshot' do
+sudo 'rsnapshot' do
   user node['rsnapshot']['client']['user']
   commands '/usr/bin/rsync'
   runas 'root'
