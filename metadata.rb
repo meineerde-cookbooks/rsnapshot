@@ -12,4 +12,3 @@ end
 depends "cron"
 depends "openssh"
 depends "sudo"
-depends "rsync"
