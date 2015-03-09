@@ -47,7 +47,11 @@ node['rsnapshot']['server']['clients'].each_pair do |fqdn, client|
   user = client['user'] || node['rsnapshot']['client']['user']
   Array(client['backup_paths']).each do |path|
     path = path.end_with?("/") ? Shellwords.escape(path) : "#{Shellwords.escape(path)}/"
-    backup_targets << "#{user}@#{fqdn}:#{path}\t#{fqdn}/"
+    if fqdn == node.name
+      backup_targets << "#{path}\t#{fqdn}/"
+    else
+      backup_targets << "#{user}@#{fqdn}:#{path}\t#{fqdn}/"
+    end
   end
 
   if client['ssh_config'] && client['ssh_config'].any?
