@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/bin/ssh -F <%= Shellwords.escape node['etc']['passwd']['root']['dir'] %>/.ssh/rsnapshot_config "$@"

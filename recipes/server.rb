@@ -13,7 +13,7 @@ end
 bash "create ssh keypair for root" do
   cwd root_home
   user "root"
-  command <<-BASH
+  code <<-BASH
     set -e
     ssh-keygen -t rsa -b 2048 -f "#{root_home}/.ssh/id_rsa" -N '' -C "root@#{node['fqdn']}-#{Time.now.strftime('%FT%T%z')}"
     chmod 0600 #{root_home}/.ssh/id_rsa
@@ -24,29 +24,42 @@ end
 
 ruby_block "save ssh public key of root" do
   block do
-    node['rsnapshot']['server']['ssh_key'] = File.read("#{root_home}/.ssh/id_rsa.pub").strip
+    node.set['rsnapshot']['server']['ssh_key'] = File.read("#{root_home}/.ssh/id_rsa.pub").strip
   end
 end
 
-directory node['rsnapshot']['server']['snapshot_root'] do
+template '/usr/local/sbin/rsnapshot-ssh' do
+  source 'rsnapshot-ssh.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+directory node['rsnapshot']['server']['config']['snapshot_root'] do
   owner "root"
   group "root"
   mode "0700"
 end
 
 backup_targets = []
-node['rsnapshot']['server']['clients'].each_pair do |fqdn, paths|
-  Array(paths).each do |path|
+ssh_host_config = {}
+node['rsnapshot']['server']['clients'].each_pair do |fqdn, client|
+  user = client['user'] || node['rsnapshot']['client']['user']
+  Array(client['backup_paths']).each do |path|
     path = path.end_with?("/") ? Shellwords.escape(path) : "#{Shellwords.escape(path)}/"
-    backup_targets << "#{node['rsnapshot']['client']['user']}@#{fqdn}:#{path}\t#{fqdn}/"
+    backup_targets << "#{user}@#{fqdn}:#{path}\t#{fqdn}/"
+  end
+
+  if client['ssh_config'] && client['ssh_config'].any?
+    ssh_host_config[fqdn] = (ssh_host_config[fqdn] || {}).merge client['ssh_config']
   end
 end
 
-search(:node, node['rsnapshot']['client_search']) do |client|
-  next unless client['rsnapshot'] && client['rsnapshot']['client'] && paths = client['rsnapshot']['client']['paths']
-  next unless paths.any?
+search(:node, node['rsnapshot']['server']['client_search']) do |client|
+  next unless client['rsnapshot'] && client['rsnapshot']['client'] && backup_paths = client['rsnapshot']['client']['backup_paths']
+  next unless backup_paths.any?
 
-  paths.each do |path|
+  backup_paths.each do |path|
     path = path.end_with?("/") ? Shellwords.escape(path) : "#{Shellwords.escape(path)}/"
     if client.name == node.name
       backup_targets << "#{path}\t#{client['fqdn']}/"
@@ -54,6 +67,20 @@ search(:node, node['rsnapshot']['client_search']) do |client|
       backup_targets << "#{client['rsnapshot']['client']['user']}@#{client['ipaddress']}:#{path}\t#{client['fqdn']}/"
     end
   end
+
+  if client['rsnapshot']['client']['ssh_config'] && client['rsnapshot']['client']['ssh_config'].any?
+    ssh_host_config[client['ipaddress']] = (ssh_host_config[client['ipaddress']] || {}).merge client['rsnapshot']['client']['ssh_config']
+  end
+end if node['rsnapshot']['server']['client_search']
+
+template "#{root_home}/.ssh/rsnapshot_config" do
+  source 'ssh_config.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+
+  variables :ssh_config => node['rsnapshot']['server']['ssh_config'],
+            :host_config => ssh_host_config
 end
 
 template node['rsnapshot']['server']['config_file'] do
@@ -61,13 +88,33 @@ template node['rsnapshot']['server']['config_file'] do
   owner "root"
   group "root"
   mode "0644"
-  variables "backup_targets" => backup_targets.sort,
-            "ssh_key_location" => "#{root_home}/.ssh/id_rsa"
+  variables "backup_targets" => backup_targets.sort
 end
 
-template "/etc/cron.d/rsnapshot" do
-  source "cron.erb"
-  owner "root"
-  group "root"
-  mode "0644"
+need_to_perform_sync = (node['rsnapshot']['server']['config']['sync_first'].to_s == '1')
+sync_command = "/usr/bin/rsnapshot sync"
+node['rsnapshot']['server']['retain'].each do |interval|
+  if node['rsnapshot']['server']['intervals'][interval.to_s]['keep'].to_i > 0
+    cron_d "rsnapshot_#{interval}" do
+      hour node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['hour']
+      minute node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['minute']
+      day node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['day']
+      month node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['month']
+      weekday node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['weekday']
+
+      user 'root'
+      mailto node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['mailto']
+
+      if need_to_perform_sync
+        command "/usr/bin/rsnapshot sync && /usr/bin/rsnapshot #{interval.to_s}"
+        need_to_perform_sync = false
+      else
+        command "/usr/bin/rsnapshot #{interval.to_s}"
+      end
+    end
+  else
+    cron_d "rsnapshot_#{interval}" do
+      action :delete
+    end
+  end
 end

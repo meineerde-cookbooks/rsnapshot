@@ -13,84 +13,23 @@
 
 config_version	1.2
 
-snapshot_root	<%= node['rsnapshot']['server']['snapshot_root'] %>
-no_create_root	1
-
-# This is the only command that must be enabled.
-cmd_rsync		/usr/bin/rsync
-
-cmd_cp			/bin/cp
-cmd_rm			/bin/rm
-cmd_ssh			/usr/bin/ssh
-cmd_logger		/usr/bin/logger
-cmd_du			/usr/bin/du
-
-#########################################
-#           BACKUP INTERVALS            #
-# Must be unique and in ascending order #
-# i.e. hourly, daily, weekly, etc.      #
-#########################################
-
-<% node['rsnapshot']['server']['intervals'].tap do |i| %>
-<%= "retain	hourly	#{i['hourly']}" if i['hourly'] %>
-<%= "retain	daily	#{i['daily']}" if i['daily'] %>
-<%= "retain	weekly	#{i['weekly']}" if i['weekly'] %>
-<%= "retain	monthly	#{i['monthly']}" if i['monthly'] %>
+<% node['rsnapshot']['server']['config'].sort.each do |key, value| %>
+<% next if value.nil? %>
+<% Array(value).each do |v| %>
+<%= key %>	<%= v %>
+<% end %>
 <% end %>
 
-# Verbose level, 1 through 5.
-# 1     Quiet           Print fatal errors only
-# 2     Default         Print errors and warnings only
-# 3     Verbose         Show equivalent shell commands being executed
-# 4     Extra Verbose   Show extra verbose information
-# 5     Debug mode      Everything
-#
-verbose		2
+#############################################################################
+# BACKUP INTERVALS
 
-# Same as verbose above, but controls the amount of data sent to the logfile
-#
-loglevel	3
-logfile		/var/log/rsnapshot.log
-
-lockfile	/var/run/rsnapshot.pid
-
-# Default rsync args. All rsync commands have at least these options set.
-rsync_short_args	-az
-rsync_long_args		--delete --numeric-ids --relative --delete-excluded --stats
-ssh_args			-o BatchMode=yes -i "<%= @ssh_key_location %>"
-du_args				-csh
-
-# don't span filesystem partitions within a backup point.
-one_fs		1
-
-# support special files (FIFOs, etc) cross-platform.
-link_dest	1
-
-# When sync_first is enabled, it changes the default behaviour of rsnapshot.
-# Normally, when rsnapshot is called with its lowest interval
-# (i.e.: "rsnapshot hourly"), it will sync files AND rotate the lowest
-# intervals. With sync_first enabled, "rsnapshot sync" handles the file sync,
-# and all interval calls simply rotate files. See the man page for more
-# details. The default is 0 (off).
-sync_first	1
-
-# If enabled, rsnapshot will move the oldest directory for each interval
-# to [interval_name].delete, then it will remove the lockfile and delete
-# that directory just before it exits. The default is 0 (off).
-use_lazy_deletes	1
-
-
-#################################
-# Globaly Excluded Directories  #
-#################################
-
-<% node['rsnapshot']['server']['exclude'].each do |exclude|
-exclude	<%= exclude.end_with?("/") ? Shellwords.escape(exclude) : "#{Shellwords.escape(exclude)}/" %>
+<% node['rsnapshot']['server']['retain'].each do |interval| %>
+<% next unless node['rsnapshot']['server']['intervals'][interval.to_s]['keep'].to_i > 0 %>
+retain	<%= interval %>	<%= node['rsnapshot']['server']['intervals'][interval.to_s]['keep'].to_i %>
 <% end %>
 
-###########################
-# Backup Targets          #
-###########################
+#############################################################################
+# BACKUP TARGETS
 
 <% @backup_targets.each do |target| %>
 backup	<%= target %>
