@@ -10,5 +10,4 @@ version          "0.0.1"
 end
 
 depends "cron"
-depends "openssh"
 depends "sudo"

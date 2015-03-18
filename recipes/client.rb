@@ -1,4 +1,3 @@
-include_recipe 'openssh'
 include_recipe 'sudo'
 
 package 'rsync'
