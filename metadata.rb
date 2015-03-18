@@ -1,5 +1,5 @@
-maintainer       "Finn GmbH"
-maintainer_email "info@finn.de"
+maintainer       "Holger Just"
+maintainer_email "hello@holgerjust.de"
 license          "MIT"
 description      "rsnapshot"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
