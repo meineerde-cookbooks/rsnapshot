@@ -12,7 +12,7 @@ user node['rsnapshot']['client']['user'] do
   supports({:manage_home => true})
 
   only_if { node['rsnapshot']['client']['create_user'] }
-  notifies :reload, 'ohai[reload users for rsnapshot]'
+  notifies :reload, 'ohai[reload users for rsnapshot]', :immediately
 end
 
 ohai 'reload users for rsnapshot' do
@@ -29,7 +29,7 @@ end
 
 sudo 'rsnapshot' do
   user node['rsnapshot']['client']['user']
-  commands '/usr/bin/rsync'
+  commands ['/usr/bin/rsync']
   runas 'root'
   nopasswd true
 end
@@ -47,8 +47,8 @@ end
 file "~#{node['rsnapshot']['client']['user']}/.ssh/authorized_keys" do
   extend Rsnapshot::RecipeHelpers
 
-  path { File.join node['etc']['passwd'][node['rsnapshot']['client']['user']]['dir'], '.ssh', 'authorized_keys' }
-  content rsnapshot_server_keys.sort.join('\n')
+  path lazy { File.join node['etc']['passwd'][node['rsnapshot']['client']['user']]['dir'], '.ssh', 'authorized_keys' }
+  content lazy { rsnapshot_server_keys.sort.join('\n') }
 
   owner node['rsnapshot']['client']['user']
   group node['rsnapshot']['client']['user']

@@ -22,7 +22,7 @@ bash "create ssh keypair for root" do
   creates "#{root_home}/.ssh/id_rsa"
 end
 
-ruby_block "save ssh public key of root" do
+ruby_block "store rsnapshot ssh key" do
   block do
     node.set['rsnapshot']['server']['ssh_key'] = File.read("#{root_home}/.ssh/id_rsa.pub").strip
   end
