@@ -1,5 +1,9 @@
 require 'shellwords'
 
+
+default['rsnapshot']['server']['commands']['rsnapshot'] = '/usr/bin/rsnapshot'
+default['rsnapshot']['server']['commands']['sync'] = '/usr/bin/rsnapshot sync'
+
 default['rsnapshot']['server']['config_file'] = '/etc/rsnapshot.conf'
 
 default['rsnapshot']['server']['config']['snapshot_root'] = '/backup'

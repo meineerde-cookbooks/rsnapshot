@@ -99,7 +99,7 @@ template node['rsnapshot']['server']['config_file'] do
 end
 
 need_to_perform_sync = (node['rsnapshot']['server']['config']['sync_first'].to_s == '1')
-sync_command = "/usr/bin/rsnapshot sync"
+sync_command = node['rsnapshot']['server']['commands']['sync']
 node['rsnapshot']['server']['retain'].each do |interval|
   if node['rsnapshot']['server']['intervals'][interval.to_s]['keep'].to_i > 0
     cron_d "rsnapshot_#{interval}" do
@@ -113,7 +113,7 @@ node['rsnapshot']['server']['retain'].each do |interval|
       mailto node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['mailto']
 
       if need_to_perform_sync
-        command "/usr/bin/rsnapshot sync && /usr/bin/rsnapshot #{interval.to_s}"
+        command "#{sync_command} && #{node['rsnapshot']['server']['commands']['rsnapshot']} #{interval.to_s}"
         need_to_perform_sync = false
       else
         command "/usr/bin/rsnapshot #{interval.to_s}"
