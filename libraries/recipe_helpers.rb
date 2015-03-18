@@ -12,7 +12,9 @@ module Rsnapshot
       end
 
       search(:node, "#{node['rsnapshot']['client']['server_search']} AND rsnapshot_server_ssh_key:* NOT name:#{node.name}") do |server|
-        server_ip = node['rsnapshot']['client']['server_search_ip_attribute'].split('/').inject(server){ |hash, attr| hash[attr] }
+        next unless server['rsnapshot'] && server['rsnapshot']['server'] && server['rsnapshot']['server']['ssh_key']
+
+        server_ip = node['rsnapshot']['client']['server_search_ip'].split('/').inject(server){ |hash, attr| hash[attr] }
 
         prefix  = ["command=\"/usr/local/bin/rsnapshot-rsync\""]
         prefix << "from=\"#{Array(server_ip).join(',')}\"" if Array(server_ip).any?

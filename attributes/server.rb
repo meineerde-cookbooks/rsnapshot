@@ -112,6 +112,10 @@ default['rsnapshot']['server']['intervals']['monthly']['cron']['weekday'] = '*'
 default['rsnapshot']['server']['intervals']['monthly']['cron']['mailto'] = nil
 
 default['rsnapshot']['server']['client_search'] = 'roles:rsnapshot_client'
+# The attribute name containing the IP address on the node object
+# retrieved via search. You can specify nested attributes by specifying them
+# in the string separated by slashes.
+default['rsnapshot']['server']['client_search_ip'] = 'ipaddress'
 
 # Additional clients which can not be inferred from the client search
 # Example:

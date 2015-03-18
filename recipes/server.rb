@@ -63,12 +63,15 @@ search(:node, node['rsnapshot']['server']['client_search']) do |client|
   next unless client['rsnapshot'] && client['rsnapshot']['client'] && backup_paths = client['rsnapshot']['client']['backup_paths']
   next unless backup_paths.any?
 
+  client_ip_attr = node['rsnapshot']['server']['client_search_ip'] || 'ipaddress'
+  client_ip = client_ip_attr.split('/').inject(client){ |hash, attr| hash[attr] }
+
   backup_paths.each do |path|
     path = path.end_with?("/") ? Shellwords.escape(path) : "#{Shellwords.escape(path)}/"
     if client.name == node.name
       backup_targets << "#{path}\t#{client['fqdn']}/"
     else
-      backup_targets << "#{client['rsnapshot']['client']['user']}@#{client['ipaddress']}:#{path}\t#{client['fqdn']}/"
+      backup_targets << "#{client['rsnapshot']['client']['user']}@#{client_ip}:#{path}\t#{client['fqdn']}/"
     end
   end
 
