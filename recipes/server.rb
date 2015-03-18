@@ -50,12 +50,13 @@ node['rsnapshot']['server']['clients'].each_pair do |fqdn, client|
     if fqdn == node.name
       backup_targets << "#{path}\t#{fqdn}/"
     else
-      backup_targets << "#{user}@#{fqdn}:#{path}\t#{fqdn}/"
+      backup_targets << "#{user}@#{client['ipaddress'] || fqdn}:#{path}\t#{fqdn}/"
     end
   end
 
   if client['ssh_config'] && client['ssh_config'].any?
-    ssh_host_config[fqdn] = (ssh_host_config[fqdn] || {}).merge client['ssh_config']
+    key = client['ipaddress'] || fqdn
+    ssh_host_config[key] = (ssh_host_config[key] || {}).merge client['ssh_config']
   end
 end
 

@@ -127,6 +127,7 @@ default['rsnapshot']['server']['client_search_ip'] = 'ipaddress'
 #   "web1.example.com" => {
 #     "backup_paths" => ["/", "/data"],
 #     "user" => "backup",
+#     "ipaddress" => "192.168.1.1",
 #     "ssh_config" => {
 #       "port" => 2222
 #     }
