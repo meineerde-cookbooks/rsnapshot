@@ -113,12 +113,18 @@ node['rsnapshot']['server']['retain'].each do |interval|
       user 'root'
       mailto node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['mailto']
 
+      rotate_cmd = "#{node['rsnapshot']['server']['commands']['rsnapshot']} #{interval.to_s}"
       if need_to_perform_sync
-        command "#{sync_command} && #{node['rsnapshot']['server']['commands']['rsnapshot']} #{interval.to_s}"
         need_to_perform_sync = false
+        if node['rsnapshot']['server']['abort_rotate_on_sync_error']
+          cmd = "#{sync_command}; [ $? -eq 1 ] && echo 'Aborting rsnapshot rotation due to previous sync error.' >&2 || #{rotate_cmd}"
+        else
+          cmd = "#{sync_command}; #{rotate_cmd}"
+        end
       else
-        command "/usr/bin/rsnapshot #{interval.to_s}"
+        cmd = rotate_cmd
       end
+      command cmd
     end
   else
     cron_d "rsnapshot_#{interval}" do

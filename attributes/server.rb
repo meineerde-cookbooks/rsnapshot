@@ -3,6 +3,12 @@ require 'shellwords'
 
 default['rsnapshot']['server']['commands']['rsnapshot'] = '/usr/bin/rsnapshot'
 default['rsnapshot']['server']['commands']['sync'] = '/usr/bin/rsnapshot sync'
+# We perform the shortest intervall rotate directly after the respective sync
+# If there are any hard errors during the sync, we can abort the respective
+# rotate in order to not bubble the incompletly synced state into the
+# preserved backups. You should check the logs in any case and potentilly
+# restart the backup manually.
+default['rsnapshot']['server']['abort_rotate_on_sync_error'] = true
 
 default['rsnapshot']['server']['config_file'] = '/etc/rsnapshot.conf'
 
