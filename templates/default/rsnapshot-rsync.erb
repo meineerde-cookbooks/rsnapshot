@@ -27,7 +27,7 @@ case "$SSH_ORIGINAL_COMMAND" in
     exit 1
   ;;
   rsync\ --server\ --sender\ *)
-    exec $sudo $nice $SSH_ORIGINAL_COMMAND
+    exec $nice $sudo $SSH_ORIGINAL_COMMAND
   ;;
   *)
     echo "Forbidden." >&2
