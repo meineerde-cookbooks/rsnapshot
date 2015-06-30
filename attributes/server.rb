@@ -2,6 +2,7 @@ require 'shellwords'
 
 
 default['rsnapshot']['server']['commands']['rsnapshot'] = '/usr/bin/rsnapshot'
+default['rsnapshot']['server']['commands']['before_sync'] = nil
 default['rsnapshot']['server']['commands']['sync'] = '/usr/bin/rsnapshot sync'
 # We perform the shortest intervall rotate directly after the respective sync
 # If there are any hard errors during the sync, we can abort the respective

@@ -106,7 +106,10 @@ nice << "/usr/bin/nice -n #{node['rsnapshot']['server']['rsnapshot_nice']} --" i
 nice << "/usr/bin/ionice -c #{node['rsnapshot']['server']['rsnapshot_ionice']} --" if node['rsnapshot']['server']['rsnapshot_ionice']
 nice = nice.join(' ')
 
-sync_command = "#{nice} #{node['rsnapshot']['server']['commands']['sync']}".strip
+sync_command = [
+  node['rsnapshot']['server']['commands']['before_sync'],
+  "#{nice} #{node['rsnapshot']['server']['commands']['sync']}".strip
+].compact.join('; ')
 
 node['rsnapshot']['server']['retain'].each do |interval|
   if node['rsnapshot']['server']['intervals'][interval.to_s]['keep'].to_i > 0
