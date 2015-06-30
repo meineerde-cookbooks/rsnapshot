@@ -10,6 +10,9 @@ default['rsnapshot']['server']['commands']['sync'] = '/usr/bin/rsnapshot sync'
 # restart the backup manually.
 default['rsnapshot']['server']['abort_rotate_on_sync_error'] = true
 
+default['rsnapshot']['server']['rsnapshot_nice'] = nil
+default['rsnapshot']['server']['rsnapshot_ionice'] = nil
+
 default['rsnapshot']['server']['config_file'] = '/etc/rsnapshot.conf'
 
 default['rsnapshot']['server']['config']['snapshot_root'] = '/backup'

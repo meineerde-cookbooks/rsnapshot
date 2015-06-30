@@ -100,7 +100,14 @@ template node['rsnapshot']['server']['config_file'] do
 end
 
 need_to_perform_sync = (node['rsnapshot']['server']['config']['sync_first'].to_s == '1')
-sync_command = node['rsnapshot']['server']['commands']['sync']
+
+nice = []
+nice << "/usr/bin/nice -n #{node['rsnapshot']['server']['rsnapshot_nice']} --" if node['rsnapshot']['server']['rsnapshot_nice']
+nice << "/usr/bin/ionice -c #{node['rsnapshot']['server']['rsnapshot_ionice']} --" if node['rsnapshot']['server']['rsnapshot_ionice']
+nice = nice.join(' ')
+
+sync_command = "#{nice} #{node['rsnapshot']['server']['commands']['sync']}".strip
+
 node['rsnapshot']['server']['retain'].each do |interval|
   if node['rsnapshot']['server']['intervals'][interval.to_s]['keep'].to_i > 0
     cron_d "rsnapshot_#{interval}" do
@@ -113,7 +120,7 @@ node['rsnapshot']['server']['retain'].each do |interval|
       user 'root'
       mailto node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['mailto']
 
-      rotate_cmd = "#{node['rsnapshot']['server']['commands']['rsnapshot']} #{interval.to_s}"
+      rotate_cmd = "#{nice} #{node['rsnapshot']['server']['commands']['rsnapshot']} #{interval.to_s}".strip
       if need_to_perform_sync
         need_to_perform_sync = false
         if node['rsnapshot']['server']['abort_rotate_on_sync_error']
