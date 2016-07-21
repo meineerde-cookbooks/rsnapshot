@@ -94,6 +94,8 @@ end
 default['rsnapshot']['server']['retain'] = ['hourly', 'daily', 'weekly', 'monthly']
 
 default['rsnapshot']['server']['intervals']['hourly']['keep'] = 2
+default['rsnapshot']['server']['intervals']['hourly']['before_rotate'] = nil
+default['rsnapshot']['server']['intervals']['hourly']['after_rotate'] = nil
 default['rsnapshot']['server']['intervals']['hourly']['cron']['hour'] = cron_hourly.(node['rsnapshot']['server']['intervals']['hourly']['keep']).join(',')
 default['rsnapshot']['server']['intervals']['hourly']['cron']['minute'] = 0
 default['rsnapshot']['server']['intervals']['hourly']['cron']['day'] = '*'
@@ -102,6 +104,8 @@ default['rsnapshot']['server']['intervals']['hourly']['cron']['weekday'] = '*'
 default['rsnapshot']['server']['intervals']['hourly']['cron']['mailto'] = nil
 
 default['rsnapshot']['server']['intervals']['daily']['keep'] = 7
+default['rsnapshot']['server']['intervals']['daily']['before_rotate'] = nil
+default['rsnapshot']['server']['intervals']['daily']['after_rotate'] = nil
 default['rsnapshot']['server']['intervals']['daily']['cron']['hour'] = 3
 default['rsnapshot']['server']['intervals']['daily']['cron']['minute'] = 30
 default['rsnapshot']['server']['intervals']['daily']['cron']['day'] = '*'
@@ -110,6 +114,8 @@ default['rsnapshot']['server']['intervals']['daily']['cron']['weekday'] = '*'
 default['rsnapshot']['server']['intervals']['daily']['cron']['mailto'] = nil
 
 default['rsnapshot']['server']['intervals']['weekly']['keep'] = 2
+default['rsnapshot']['server']['intervals']['weekly']['before_rotate'] = nil
+default['rsnapshot']['server']['intervals']['weekly']['after_rotate'] = nil
 default['rsnapshot']['server']['intervals']['weekly']['cron']['hour'] = 3
 default['rsnapshot']['server']['intervals']['weekly']['cron']['minute'] = 0
 default['rsnapshot']['server']['intervals']['weekly']['cron']['day'] = '*'
@@ -118,6 +124,8 @@ default['rsnapshot']['server']['intervals']['weekly']['cron']['weekday'] = 1 # M
 default['rsnapshot']['server']['intervals']['weekly']['cron']['mailto'] = nil
 
 default['rsnapshot']['server']['intervals']['monthly']['keep'] = nil
+default['rsnapshot']['server']['intervals']['monthly']['before_rotate'] = nil
+default['rsnapshot']['server']['intervals']['monthly']['after_rotate'] = nil
 default['rsnapshot']['server']['intervals']['monthly']['cron']['hour'] = 2
 default['rsnapshot']['server']['intervals']['monthly']['cron']['minute'] = 30
 default['rsnapshot']['server']['intervals']['monthly']['cron']['day'] = 1

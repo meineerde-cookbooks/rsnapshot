@@ -123,7 +123,11 @@ node['rsnapshot']['server']['retain'].each do |interval|
       user 'root'
       mailto node['rsnapshot']['server']['intervals'][interval.to_s]['cron']['mailto']
 
-      rotate_cmd = "#{nice} #{node['rsnapshot']['server']['commands']['rsnapshot']} #{interval.to_s}".strip
+      rotate_cmd = [
+        node['rsnapshot']['server']['intervals'][interval.to_s]['before_rotate'],
+        "#{nice} #{node['rsnapshot']['server']['commands']['rsnapshot']} #{interval.to_s}".strip,
+        node['rsnapshot']['server']['intervals'][interval.to_s]['after_rotate']
+      ].compact.join(' && ')
       if need_to_perform_sync
         need_to_perform_sync = false
         if node['rsnapshot']['server']['abort_rotate_on_sync_error']
