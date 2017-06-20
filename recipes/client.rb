@@ -47,7 +47,7 @@ file "~#{node['rsnapshot']['client']['user']}/.ssh/authorized_keys" do
   extend Rsnapshot::RecipeHelpers
 
   path lazy { File.join node['etc']['passwd'][node['rsnapshot']['client']['user']]['dir'], '.ssh', 'authorized_keys' }
-  content lazy { rsnapshot_server_keys.sort.join('\n') }
+  content lazy { rsnapshot_server_keys.sort.join("\n") }
 
   owner node['rsnapshot']['client']['user']
   group node['rsnapshot']['client']['user']
