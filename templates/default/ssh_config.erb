@@ -5,17 +5,20 @@
 #
 # Source: rsnapshot::templates/default/ssh_config.erb
 
-<% @ssh_config.each do |key, value| %>
-<%   Array(value).each do |item| %>
-<%=    "#{key.split("_").map { |w| w.capitalize}.join} #{item}" %>
-<%   end %>
-<% end %>
-
 <% @host_config.each do |host, options| %>
 <%=  "Host #{host}"%>
 <%   options.each do |key, value| %>
 <%     Array(value).each do |item| %>
 <%=      "  #{key.split("_").map { |w| w.capitalize}.join} #{item}" %>
 <%     end %>
+<%   end %>
+<% end %>
+
+<% if @ssh_config.any? %>
+Host *
+<% end %>
+<% @ssh_config.each do |key, value| %>
+<%   Array(value).each do |item| %>
+<%=    "  #{key.split("_").map { |w| w.capitalize}.join} #{item}" %>
 <%   end %>
 <% end %>
